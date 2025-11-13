@@ -143,11 +143,11 @@ final class MockN8nClient implements N8nClientInterface
      * Can be called multiple times to queue different responses
      *
      * @param array $response The response data to return
-     * @return self
      */
     public function willReturn(array $response): self
     {
         $this->responseQueue[] = $response;
+
         return $this;
     }
 
@@ -155,13 +155,13 @@ final class MockN8nClient implements N8nClientInterface
      * Set multiple responses to be returned in sequence
      *
      * @param array $responses Array of response arrays
-     * @return self
      */
     public function willReturnSequence(array $responses): self
     {
         foreach ($responses as $response) {
             $this->responseQueue[] = $response;
         }
+
         return $this;
     }
 
@@ -169,11 +169,11 @@ final class MockN8nClient implements N8nClientInterface
      * Configure the client to throw an exception on the next request
      *
      * @param \Throwable $exception The exception to throw
-     * @return self
      */
     public function willThrow(\Throwable $exception): self
     {
         $this->exceptionToThrow = $exception;
+
         return $this;
     }
 
@@ -181,11 +181,11 @@ final class MockN8nClient implements N8nClientInterface
      * Set the client ID returned by getClientId()
      *
      * @param string $clientId The client ID
-     * @return self
      */
     public function withClientId(string $clientId): self
     {
         $this->clientId = $clientId;
+
         return $this;
     }
 
@@ -193,11 +193,11 @@ final class MockN8nClient implements N8nClientInterface
      * Set the health status returned by isHealthy()
      *
      * @param bool $isHealthy The health status
-     * @return self
      */
     public function withHealthStatus(bool $isHealthy): self
     {
         $this->isHealthy = $isHealthy;
+
         return $this;
     }
 
@@ -216,7 +216,7 @@ final class MockN8nClient implements N8nClientInterface
 
         if (empty($matchingRequests)) {
             throw new \PHPUnit\Framework\AssertionFailedError(
-                sprintf('Failed asserting that a request was sent to workflow "%s".', $workflowId)
+                \sprintf('Failed asserting that a request was sent to workflow "%s".', $workflowId),
             );
         }
     }
@@ -234,7 +234,7 @@ final class MockN8nClient implements N8nClientInterface
 
         if (!empty($matchingRequests)) {
             throw new \PHPUnit\Framework\AssertionFailedError(
-                sprintf('Failed asserting that no request was sent to workflow "%s".', $workflowId)
+                \sprintf('Failed asserting that no request was sent to workflow "%s".', $workflowId),
             );
         }
     }
@@ -247,11 +247,11 @@ final class MockN8nClient implements N8nClientInterface
      */
     public function assertSentCount(int $count): void
     {
-        $actual = count($this->sentRequests);
+        $actual = \count($this->sentRequests);
 
         if ($actual !== $count) {
             throw new \PHPUnit\Framework\AssertionFailedError(
-                sprintf('Failed asserting that exactly %d request(s) were sent. Actually sent %d.', $count, $actual)
+                \sprintf('Failed asserting that exactly %d request(s) were sent. Actually sent %d.', $count, $actual),
             );
         }
     }
@@ -290,8 +290,6 @@ final class MockN8nClient implements N8nClientInterface
 
     /**
      * Get all recorded requests
-     *
-     * @return array
      */
     public function getRequests(): array
     {
@@ -302,21 +300,18 @@ final class MockN8nClient implements N8nClientInterface
      * Get requests sent to a specific workflow
      *
      * @param string $workflowId The workflow ID
-     * @return array
      */
     public function getRequestsFor(string $workflowId): array
     {
         return array_filter(
             $this->sentRequests,
-            fn (array $request) => $request['workflow_id'] === $workflowId
+            fn (array $request) => $request['workflow_id'] === $workflowId,
         );
     }
 
     /**
      * Clear all recorded requests and queued responses
      * Useful for resetting state between tests
-     *
-     * @return self
      */
     public function reset(): self
     {
@@ -324,6 +319,7 @@ final class MockN8nClient implements N8nClientInterface
         $this->responseQueue = [];
         $this->exceptionToThrow = null;
         $this->uuidCounter = 0;
+
         return $this;
     }
 
@@ -348,7 +344,7 @@ final class MockN8nClient implements N8nClientInterface
                 }
 
                 return true;
-            }
+            },
         );
     }
 
@@ -363,10 +359,10 @@ final class MockN8nClient implements N8nClientInterface
 
     private function generateUuid(): string
     {
-        return sprintf('mock-uuid-%d', ++$this->uuidCounter);
+        return \sprintf('mock-uuid-%d', ++$this->uuidCounter);
     }
 
-    private function mapResponse(N8nPayloadInterface $payload, array $responseData): object|array|null
+    private function mapResponse(N8nPayloadInterface $payload, array $responseData): ?object
     {
         if (!method_exists($payload, 'getN8nResponseClass')) {
             return null;
