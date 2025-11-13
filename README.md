@@ -355,6 +355,114 @@ $handler = new ForumPostModerationHandler();
 $uuid = $n8nClient->sendWithCallback($post, 'moderation-workflow-id', $handler);
 ```
 
+## Testing
+
+### Mock Client
+
+For testing your application without making actual HTTP requests to n8n, use the `MockN8nClient`:
+
+```php
+<?php
+
+use Freema\N8nBundle\Testing\MockN8nClient;
+
+class MyServiceTest extends TestCase
+{
+    private MockN8nClient $mockN8n;
+
+    protected function setUp(): void
+    {
+        $this->mockN8n = new MockN8nClient();
+    }
+
+    public function testForumPostModeration(): void
+    {
+        // Configure the mock response
+        $this->mockN8n->willReturn([
+            'status' => 'approved',
+            'spam_score' => 0.1,
+            'confidence' => 'high'
+        ]);
+
+        // Test your service
+        $service = new ModerationService($this->mockN8n);
+        $result = $service->moderatePost($forumPost);
+
+        // Verify the request was sent
+        $this->mockN8n->assertSent('moderation-workflow-id');
+        $this->mockN8n->assertSentCount(1);
+
+        // Verify payload content
+        $this->mockN8n->assertSentWithPayload('moderation-workflow-id', [
+            'text' => 'Forum post content'
+        ]);
+    }
+}
+```
+
+#### Mock Client Features
+
+**Configure responses:**
+```php
+// Single response
+$mockClient->willReturn(['status' => 'ok']);
+
+// Multiple responses in sequence
+$mockClient->willReturnSequence([
+    ['status' => 'pending'],
+    ['status' => 'completed'],
+]);
+
+// Simulate exceptions
+$mockClient->willThrow(new N8nCommunicationException('Connection failed', 500));
+```
+
+**Assertions:**
+```php
+// Assert request was sent
+$mockClient->assertSent('workflow-id');
+
+// Assert with custom callback
+$mockClient->assertSent('workflow-id', function (array $request) {
+    return $request['payload']->getSomeValue() === 'expected';
+});
+
+// Assert request was not sent
+$mockClient->assertNotSent('workflow-id');
+
+// Assert number of requests
+$mockClient->assertSentCount(3);
+
+// Assert nothing was sent
+$mockClient->assertNothingSent();
+
+// Assert payload data
+$mockClient->assertSentWithPayload('workflow-id', [
+    'key' => 'expected-value'
+]);
+```
+
+**Inspect requests:**
+```php
+// Get all requests
+$requests = $mockClient->getRequests();
+
+// Get requests for specific workflow
+$requests = $mockClient->getRequestsFor('workflow-id');
+
+// Reset state between tests
+$mockClient->reset();
+```
+
+**Configure behavior:**
+```php
+// Custom client ID
+$mockClient->withClientId('test-client');
+
+// Health status
+$mockClient->withHealthStatus(false);
+```
+
 ## Configuration
 
 ### Complete Configuration
