@@ -59,6 +59,7 @@ final class Configuration implements ConfigurationInterface
                             ->end()
                             ->arrayNode('default_headers')
                                 ->useAttributeAsKey('name')
+                                ->normalizeKeys(false)
                                 ->prototype('scalar')->end()
                             ->end()
                             ->scalarNode('proxy')
