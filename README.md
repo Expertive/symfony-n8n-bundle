@@ -499,6 +499,10 @@ n8n:
     max_request_age_seconds: 86400
 ```
 
+## Author
+
+Created by [Tomáš Grasl](https://www.tomasgrasl.cz/)
+
 ## License
 
 MIT
