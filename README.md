@@ -12,6 +12,13 @@ Elegant integration between Symfony applications and n8n workflow automation pla
 - **Multi-instance support** for different environments
 - **Dry run mode** for testing without actual sending
 
+## Requirements
+
+| Version | PHP | Symfony |
+|---------|-----|---------|
+| 1.2+    | ^8.2 | 6.4, 7.x, 8.0 |
+| 1.0-1.1 | ^8.1 | 6.4, 7.0 |
+
 ## Quick Start
 
 ### 1. Installation
