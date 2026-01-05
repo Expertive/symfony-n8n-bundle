@@ -12,6 +12,16 @@ Elegant integration between Symfony applications and n8n workflow automation pla
 - **Multi-instance support** for different environments
 - **Dry run mode** for testing without actual sending
 
+## Requirements
+
+| Version | PHP | Symfony |
+|---------|-----|---------|
+| 1.3+    | ^8.2 | 6.4, 7.x |
+| 1.3+    | ^8.4 | 8.0 |
+| 1.0-1.2 | ^8.1 | 6.4, 7.0 |
+
+> **Note:** Symfony 8.0 requires PHP 8.4+
+
 ## Quick Start
 
 ### 1. Installation
@@ -249,11 +259,11 @@ class N8nMonitoringListener implements EventSubscriberInterface
 
 ## Test Application
 
-The `dev/` directory contains a test application with Docker support:
+The `dev/` directory contains a test application with Docker support (PHP 8.2 + PHP 8.4).
 
 ### Setup
 
-1. Start Docker container:
+1. Start Docker containers:
 ```bash
 task up
 ```
@@ -286,21 +296,30 @@ Application will be available at http://localhost:8080
 ```bash
 # Environment management
 task init          # Initialize development environment
-task up            # Start Docker containers
+task up            # Start Docker containers (PHP 8.2 + 8.4)
 task down          # Stop Docker containers
 task restart       # Restart environment
 task logs          # Show logs
 
 # Development
 task serve         # Start dev server
-task shell         # Shell into dev container
-
-# N8n testing
-task test:health   # Health check
+task shell         # Shell into PHP 8.2 container
+task shell84       # Shell into PHP 8.4 container
 
 # Testing
-task test          # Run PHPUnit tests
+task test          # Run PHPUnit tests (PHP 8.2)
+task test:84       # Run PHPUnit tests (PHP 8.4)
+task test:coverage # Run tests with coverage report
+
+# Symfony Version Matrix
+task test:sf64     # Test with Symfony 6.4 (PHP 8.2)
+task test:sf71     # Test with Symfony 7.1 (PHP 8.2)
+task test:sf80     # Test with Symfony 8.0 (PHP 8.4)
+task test:matrix   # Run full test matrix
+
+# Code Quality
 task stan          # PHPStan analysis
+task cs            # Check code style
 task cs:fix        # Fix code style
 ```
 
