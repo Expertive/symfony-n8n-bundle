@@ -48,7 +48,7 @@ jobs:
       - name: Install composer dependencies
         run: |
           composer config --no-plugins allow-plugins.php-http/discovery true
-          composer install --no-interaction --no-progress --no-audit
+          composer install --no-interaction --no-progress
 
       - name: Verify phpstan.neon exists
         run: |
@@ -163,7 +163,7 @@ jobs:
       - name: Install composer dependencies
         run: |
           composer config --no-plugins allow-plugins.php-http/discovery true
-          composer install --no-interaction --no-progress --no-audit
+          composer install --no-interaction --no-progress
 
       - name: Create test directories
         run: |
