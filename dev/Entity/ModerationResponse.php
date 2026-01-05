@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Freema\N8nBundle\Dev\Entity;
 
-final readonly class ModerationResponse
+final readonly class ModerationResponse implements \Stringable
 {
     public function __construct(
         public bool $allowed,
