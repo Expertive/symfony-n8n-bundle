@@ -43,18 +43,30 @@ final class N8nHttpClient
 
         $url = $this->config->getWebhookUrl($request->workflowId);
         $payload = $request->toWebhookPayload();
+        $requestMethod = $request->requestMethod;
+        $httpMethod = $requestMethod->getHttpMethod();
 
         $options = [
-            'json' => $payload,
             'timeout' => $request->timeoutSeconds ?? $this->config->timeoutSeconds,
         ];
+
+        // Set payload based on request method type
+        if ($requestMethod === \Freema\N8nBundle\Enum\RequestMethod::GET) {
+            $options['query'] = $payload;
+        } elseif ($requestMethod->isFormData()) {
+            $options['body'] = $payload;
+            $options['headers'] = ['Content-Type' => 'application/x-www-form-urlencoded'];
+        } else {
+            // JSON is default
+            $options['json'] = $payload;
+        }
 
         if ($this->config->authToken !== null) {
             $options['auth_bearer'] = $this->config->authToken;
         }
 
         try {
-            return $this->httpClient->request('POST', $url, $options);
+            return $this->httpClient->request($httpMethod, $url, $options);
         } catch (\Throwable $e) {
             if (str_contains($e->getMessage(), 'timeout')) {
                 // @phpstan-ignore-next-line

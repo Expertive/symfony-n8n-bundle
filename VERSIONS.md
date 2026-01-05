@@ -11,15 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Symfony 8.0 Support**: Full compatibility with Symfony 8.0
 - **PHP 8.4 Support**: Tested and verified with PHP 8.4
 - **Enhanced CI/CD Pipeline**: Matrix testing across all supported PHP and Symfony versions
+- **Full RequestMethod Support**: HTTP client now respects `getN8nRequestMethod()` from payload (GET, POST_JSON, POST_FORM, PUT, PATCH)
 
 ### Changed
 - **Minimum PHP Version**: Now requires PHP 8.2+ (previously 8.1)
 - **Route Attribute Namespace**: Updated from deprecated `Annotation\Route` to `Attribute\Route`
 - **PHPUnit Configuration**: Updated for PHPUnit 10/11 compatibility
 - **Stricter Deprecation Testing**: Enhanced deprecation detection in tests
+- **N8nRequest**: Added `requestMethod` property for proper HTTP method handling
+
+### Fixed
+- **Memory Leak in RequestTracker**: Fixed missing `completeRequest()` call on successful `send()` - requests were never removed from tracker causing memory growth
+- **RequestMethod Ignored**: `N8nPayloadInterface::getN8nRequestMethod()` is now properly used by `N8nHttpClient` to set HTTP method and Content-Type
 
 ### Breaking Changes
-- PHP 8.1 is no longer supported (Symfony 8.0 requires PHP 8.2+)
+- PHP 8.1 is no longer supported
+- Symfony 8.0 requires PHP 8.4+ (Symfony framework requirement)
 
 ## [1.1.0] - 2025-07-14
 
@@ -94,15 +101,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Compatibility
 
 ### Symfony versions
-- ✅ Symfony 6.4.x (LTS)
-- ✅ Symfony 7.0.x
-- ✅ Symfony 7.1.x
-- ✅ Symfony 8.0.x
+- ✅ Symfony 6.4.x (LTS) - PHP 8.2+
+- ✅ Symfony 7.0.x - PHP 8.2+
+- ✅ Symfony 7.1.x - PHP 8.2+
+- ✅ Symfony 8.0.x - PHP 8.4+ (Symfony requirement)
 
 ### PHP versions
-- ✅ PHP 8.2
-- ✅ PHP 8.3
-- ✅ PHP 8.4
+- ✅ PHP 8.2 (Symfony 6.4, 7.x)
+- ✅ PHP 8.3 (Symfony 6.4, 7.x)
+- ✅ PHP 8.4 (all Symfony versions including 8.0)
 
 ### N8n versions
 - ✅ N8n 1.0+
