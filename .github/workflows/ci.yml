@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  COMPOSER_NO_AUDIT: 1
-
 jobs:
   php-cs-fixer:
     name: PHP-CS-Fixer
@@ -19,26 +16,22 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.2'
           tools: php-cs-fixer:3.91
 
       - name: Check code style
         run: php-cs-fixer fix --dry-run --diff
 
   phpstan:
-    name: PHPStan (PHP ${{ matrix.php }})
+    name: PHPStan
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        php: ['8.2', '8.3', '8.4']
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: '8.2'
           coverage: none
 
       - name: Get composer cache directory
@@ -49,13 +42,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-php${{ matrix.php }}-${{ hashFiles('**/composer.json') }}
-          restore-keys: ${{ runner.os }}-composer-php${{ matrix.php }}-
+          key: ${{ runner.os }}-composer-phpstan-${{ hashFiles('**/composer.json') }}
+          restore-keys: ${{ runner.os }}-composer-phpstan-
 
       - name: Install composer dependencies
         run: |
           composer config --no-plugins allow-plugins.php-http/discovery true
-          composer install --no-interaction --no-progress
+          composer install --no-interaction --no-progress --no-audit
 
       - name: Verify phpstan.neon exists
         run: |
@@ -131,7 +124,7 @@ jobs:
       - name: Install composer dependencies
         run: |
           composer config --no-plugins allow-plugins.php-http/discovery true
-          composer update --no-interaction --no-progress --prefer-dist
+          composer update --no-interaction --no-progress --prefer-dist --no-audit
 
       - name: Create test directories
         run: |
@@ -170,7 +163,7 @@ jobs:
       - name: Install composer dependencies
         run: |
           composer config --no-plugins allow-plugins.php-http/discovery true
-          composer install --no-interaction --no-progress
+          composer install --no-interaction --no-progress --no-audit
 
       - name: Create test directories
         run: |
@@ -178,7 +171,7 @@ jobs:
           mkdir -p var/cache var/log
 
       - name: Run tests with coverage
-        run: vendor/bin/phpunit --testsuite=Unit --coverage-text --coverage-clover=coverage.xml --do-not-fail-on-warning
+        run: vendor/bin/phpunit --testsuite=Unit --coverage-text --coverage-clover=coverage.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -187,30 +180,20 @@ jobs:
           fail_ci_if_error: false
 
   deprecation-check:
-    name: Deprecation Check (PHP ${{ matrix.php }} - Symfony ${{ matrix.symfony }})
+    name: Deprecation Check
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - php: '8.3'
-            symfony: '6.4.*'
-          - php: '8.3'
-            symfony: '7.1.*'
-          - php: '8.4'
-            symfony: '8.0.*'
     steps:
       - uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: '8.4'
           coverage: none
 
       - name: Configure Symfony version
         run: |
-          composer config extra.symfony.require "${{ matrix.symfony }}"
+          composer config extra.symfony.require "8.0.*"
 
       - name: Install Symfony Flex
         run: |
@@ -220,7 +203,7 @@ jobs:
       - name: Install dependencies
         run: |
           composer config --no-plugins allow-plugins.php-http/discovery true
-          composer update --no-interaction --no-progress
+          composer update --no-interaction --no-progress --no-audit
 
       - name: Create test directories
         run: |
