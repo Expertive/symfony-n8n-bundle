@@ -9,7 +9,7 @@
          displayDetailsOnTestsThatTriggerWarnings="true"
          displayDetailsOnTestsThatTriggerDeprecations="true">
 
-    <coverage>
+    <source>
         <include>
             <directory suffix=".php">src</directory>
         </include>
@@ -17,7 +17,7 @@
             <directory>src/Resources</directory>
             <file>src/N8nBundle.php</file>
         </exclude>
-    </coverage>
+    </source>
 
     <testsuites>
         <testsuite name="Unit">

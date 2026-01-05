@@ -11,6 +11,20 @@ services:
     tty: true
     stdin_open: true
     command: >
-      bash -c "apt-get update && apt-get install -y git unzip curl && 
-      curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && 
+      bash -c "apt-get update && apt-get install -y git unzip curl &&
+      curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer &&
+      tail -f /dev/null"
+
+  php84:
+    container_name: n8n-bundle-php84
+    image: php:8.4-cli
+    volumes:
+      - ./:/code:cached
+      - ~/.composer/cache:/root/.composer/cache:cached
+    working_dir: /code
+    tty: true
+    stdin_open: true
+    command: >
+      bash -c "apt-get update && apt-get install -y git unzip curl &&
+      curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer &&
       tail -f /dev/null"

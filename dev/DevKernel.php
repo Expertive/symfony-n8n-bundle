@@ -7,7 +7,6 @@ namespace Freema\N8nBundle\Dev;
 use Freema\N8nBundle\N8nBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
-use Symfony\Bundle\MonologBundle\MonologBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -24,7 +23,6 @@ class DevKernel extends Kernel
         return [
             new FrameworkBundle(),
             new TwigBundle(),
-            new MonologBundle(),
             new WebProfilerBundle(),
             new N8nBundle(),
         ];
@@ -41,20 +39,6 @@ class DevKernel extends Kernel
             ],
             'profiler' => [
                 'only_exceptions' => false,
-            ],
-        ]);
-
-        // Monolog configuration
-        $container->loadFromExtension('monolog', [
-            'handlers' => [
-                'main' => [
-                    'type' => 'stream',
-                    'path' => '%kernel.logs_dir%/%kernel.environment%.log',
-                    'level' => 'debug',
-                ],
-                'console' => [
-                    'type' => 'console',
-                ],
             ],
         ]);
 

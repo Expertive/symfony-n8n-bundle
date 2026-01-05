@@ -2,7 +2,8 @@ version: '3'
 
 vars:
   COMPOSE: docker compose
-  CONTAINER_NAME: n8n-bundle-php
+  PHP82: n8n-bundle-php
+  PHP84: n8n-bundle-php84
 
 tasks:
   # Setup Development Environment
@@ -16,7 +17,7 @@ tasks:
   composer:install:
     desc: 'Install composer dependencies'
     cmd: |
-      docker exec {{ .CONTAINER_NAME }} sh -c "
+      docker exec {{ .PHP82 }} sh -c "
         if ! command -v composer > /dev/null 2>&1; then
           echo 'Installing Composer...'
           curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -27,9 +28,8 @@ tasks:
 
   # Docker Management
   up:
-    desc: 'Start development environment'
-    cmd: |
-      {{ .COMPOSE }} up -d
+    desc: 'Start development environment (PHP 8.2 + 8.4)'
+    cmd: '{{ .COMPOSE }} up -d'
     aliases: ['u']
 
   down:
@@ -51,52 +51,87 @@ tasks:
 
   # Development Tasks
   shell:
-    desc: 'Open shell in PHP container'
-    cmd: 'docker exec -it {{ .CONTAINER_NAME }} sh'
-    aliases:
-      - sh
+    desc: 'Open shell in PHP 8.2 container'
+    cmd: 'docker exec -it {{ .PHP82 }} sh'
+    aliases: ['sh']
+
+  shell84:
+    desc: 'Open shell in PHP 8.4 container'
+    cmd: 'docker exec -it {{ .PHP84 }} sh'
 
   serve:
     desc: 'Start development server'
-    cmd: 'docker exec {{ .CONTAINER_NAME }} php -S 0.0.0.0:8080 -t dev/'
-    aliases:
-      - dev
+    cmd: 'docker exec {{ .PHP82 }} php -S 0.0.0.0:8080 -t dev/'
+    aliases: ['dev']
 
   # Testing
+  test:
+    desc: 'Run PHPUnit tests (PHP 8.2)'
+    cmd: 'docker exec {{ .PHP82 }} vendor/bin/phpunit --testsuite=Unit'
+
+  test:84:
+    desc: 'Run PHPUnit tests (PHP 8.4)'
+    cmd: 'docker exec {{ .PHP84 }} vendor/bin/phpunit --testsuite=Unit'
+
+  test:coverage:
+    desc: 'Run tests with coverage report'
+    cmd: 'docker exec {{ .PHP82 }} vendor/bin/phpunit --testsuite=Unit --coverage-html=var/coverage'
+
   test:health:
     desc: 'Check application health'
     cmd: 'curl -X GET http://localhost:8080/demo/health'
 
-  test:
-    desc: 'Run all PHPUnit tests'
-    cmd: 'docker exec {{ .CONTAINER_NAME }} vendor/bin/phpunit'
+  # Symfony Version Matrix Testing
+  test:sf64:
+    desc: 'Test with Symfony 6.4 (PHP 8.2)'
+    cmd: |
+      docker exec {{ .PHP82 }} sh -c "
+        composer config extra.symfony.require '6.4.*' &&
+        composer update --no-interaction --no-progress &&
+        vendor/bin/phpunit --testsuite=Unit
+      "
 
-  test:unit:
-    desc: 'Run unit tests only'
-    cmd: 'docker exec {{ .CONTAINER_NAME }} vendor/bin/phpunit --testsuite=Unit'
+  test:sf71:
+    desc: 'Test with Symfony 7.1 (PHP 8.2)'
+    cmd: |
+      docker exec {{ .PHP82 }} sh -c "
+        composer config extra.symfony.require '7.1.*' &&
+        composer update --no-interaction --no-progress &&
+        vendor/bin/phpunit --testsuite=Unit
+      "
 
-  test:coverage:
-    desc: 'Run tests with coverage report'
-    cmd: 'docker exec {{ .CONTAINER_NAME }} vendor/bin/phpunit --coverage-html=var/coverage'
+  test:sf80:
+    desc: 'Test with Symfony 8.0 (PHP 8.4)'
+    cmd: |
+      docker exec {{ .PHP84 }} sh -c "
+        composer config extra.symfony.require '8.0.*' &&
+        composer update --no-interaction --no-progress &&
+        vendor/bin/phpunit --testsuite=Unit
+      "
 
-  test:watch:
-    desc: 'Watch files and run tests automatically'
-    cmd: 'docker exec {{ .CONTAINER_NAME }} vendor/bin/phpunit-watcher watch'
+  test:matrix:
+    desc: 'Run full test matrix (Symfony 6.4, 7.1, 8.0)'
+    cmds:
+      - task: test:sf64
+      - task: test:sf71
+      - task: test:sf80
+      - cmd: |
+          docker exec {{ .PHP82 }} composer config extra.symfony.require '^6.4|^7.0|^8.0'
+        silent: true
 
   # Code Quality
   stan:
     desc: 'Run PHPStan analysis'
-    cmd: 'docker exec {{ .CONTAINER_NAME }} vendor/bin/phpstan analyse'
+    cmd: 'docker exec {{ .PHP82 }} vendor/bin/phpstan analyse'
 
   cs:
     desc: 'Check code style'
-    cmd: 'docker exec {{ .CONTAINER_NAME }} vendor/bin/php-cs-fixer fix --dry-run --diff'
+    cmd: 'docker exec {{ .PHP82 }} vendor/bin/php-cs-fixer fix --dry-run --diff'
 
   cs:fix:
     desc: 'Fix code style'
-    cmd: 'docker exec {{ .CONTAINER_NAME }} vendor/bin/php-cs-fixer fix'
-    aliases:
-      - fixer
+    cmd: 'docker exec {{ .PHP82 }} vendor/bin/php-cs-fixer fix'
+    aliases: ['fixer']
 
   default:
     desc: 'Show available commands'

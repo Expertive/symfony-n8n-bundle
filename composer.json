@@ -33,7 +33,6 @@
         "friendsofphp/php-cs-fixer": "^3.14",
         "symfony/web-profiler-bundle": "^6.4|^7.0|^8.0",
         "symfony/twig-bundle": "^6.4|^7.0|^8.0",
-        "symfony/monolog-bundle": "^3.10",
         "symfony/dotenv": "^6.4|^7.0|^8.0"
     },
     "autoload": {
