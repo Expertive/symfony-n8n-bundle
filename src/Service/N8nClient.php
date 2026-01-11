@@ -38,6 +38,7 @@ final class N8nClient implements N8nClientInterface
             mode: $mode,
             clientId: $this->config->clientId,
             createdAt: new \DateTimeImmutable(),
+            requestMethod: $payload->getN8nRequestMethod(),
         );
 
         $this->requestTracker->trackRequest($request);
@@ -93,6 +94,8 @@ final class N8nClient implements N8nClientInterface
                 }
             }
 
+            $this->requestTracker->completeRequest($request->uuid);
+
             return new N8nResponse(
                 uuid: $request->uuid,
                 response: $responseData,
@@ -116,6 +119,7 @@ final class N8nClient implements N8nClientInterface
             mode: CommunicationMode::ASYNC_WITH_CALLBACK,
             clientId: $this->config->clientId,
             createdAt: new \DateTimeImmutable(),
+            requestMethod: $payload->getN8nRequestMethod(),
             responseHandler: $handler,
             callbackUrl: $callbackUrl,
         );
@@ -149,6 +153,7 @@ final class N8nClient implements N8nClientInterface
             mode: CommunicationMode::SYNC,
             clientId: $this->config->clientId,
             createdAt: new \DateTimeImmutable(),
+            requestMethod: $payload->getN8nRequestMethod(),
             timeoutSeconds: $timeoutSeconds,
         );
 

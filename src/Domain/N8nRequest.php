@@ -7,6 +7,7 @@ namespace Freema\N8nBundle\Domain;
 use Freema\N8nBundle\Contract\N8nPayloadInterface;
 use Freema\N8nBundle\Contract\N8nResponseHandlerInterface;
 use Freema\N8nBundle\Enum\CommunicationMode;
+use Freema\N8nBundle\Enum\RequestMethod;
 
 final readonly class N8nRequest
 {
@@ -17,6 +18,7 @@ final readonly class N8nRequest
         public CommunicationMode $mode,
         public string $clientId,
         public \DateTimeImmutable $createdAt,
+        public RequestMethod $requestMethod = RequestMethod::POST_JSON,
         public ?N8nResponseHandlerInterface $responseHandler = null,
         public ?string $callbackUrl = null,
         public ?int $timeoutSeconds = null,
